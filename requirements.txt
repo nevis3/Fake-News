@@ -19,3 +19,5 @@ regex==2022.10.31
 six==1.16.0
 tqdm==4.64.1
 wincertstore==0.2
+
+cleantext~=1.1.4
