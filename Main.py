@@ -9,6 +9,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
+from sklearn.tree import  DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import OneHotEncoder
 
 
 df = pd.read_csv('news_sample.csv', encoding='utf8')
@@ -87,20 +90,23 @@ end_result = []
 
 for i in range(0,len(df)-1):
     #print(str(df.iloc[i]['type']))
-    if str(df.iloc[i]['type']) == "nan" or "unknown":
-        print(df.iloc[i]['type'])
+    if str(df.iloc[i]['type']) == "nan" or str(df.iloc[i]['type']) == "unknown":
+        #print(df.iloc[i]['type'])
         continue
     data_new = clean_data(df.iloc[i]['content'], ['<url>', '<email>', '<phone>', '<number>', '<digit>', '<cur>'])
     word_counter += Counter(data_new[0])
     pre_stopwords_counter += Counter(data_new[2])
     pre_stemmed_words += Counter(data_new[3])
-    end_result.append([' '.join(data_new[0]), df.iloc[i]['type']])
+    type_name = df.iloc[i]['type']
+    if type_name in ['unreliable', 'bias', 'clickbait', 'junksci', 'political', 'conspiracy', 'hate', 'fake']:
+        type_name = 'fake'
+    end_result.append([' '.join(data_new[0]), type_name])
 
 
     for j in range(0, len(data_new[1])):
         url_counter[j][1] += data_new[1][j][1]
 
-print(end_result)
+#print(end_result)
 item_list = list(word_counter.items())
 sorted_list = sorted(item_list, key=(lambda tpl: tpl[1]), reverse=True)
 #print(end_result)
@@ -124,6 +130,9 @@ ax = fig.add_axes([0,0,3.5,1])
 ax.bar(name_list, count_list)
 plt.show()"""
 
+#enc = OneHotEncoder(handle_unknown='ignore')
+
+#X = OneHotEncoder().fit_transform(sorted_list)
 
 
 X_train, X_test, y_train, y_test = train_test_split(df_processed_end_results['artikler'], df_processed_end_results['type'],
@@ -132,6 +141,9 @@ X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, test_size=0.5, r
 
 print("X:", X_train, X_test, X_val)
 print("y:", y_train, y_test, y_val)
-typecounter = Counter(df['type'])
-print(set(df['type']))
-print(typecounter)
+#typecounter = Counter(df['type'])
+
+#print(set(df['type']))
+#print(set(df_processed_end_results['type']))
+#print(typecounter)
+
