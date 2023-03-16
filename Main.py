@@ -9,13 +9,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
-from sklearn.tree import  DecisionTreeClassifier
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
-from sklearn.preprocessing import OneHotEncoder
-
+from sklearn.linear_model import LogisticRegression, LinearRegression
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 
 df = pd.read_csv('news_sample.csv', encoding='utf8')
-
 
 def clean_data(input_text, regex_filter):
     cleaned_text = re.sub(r'(\S+\.com*\S+)', '<url>', input_text)
@@ -135,12 +135,37 @@ plt.show()"""
 #X = OneHotEncoder().fit_transform(sorted_list)
 
 
-X_train, X_test, y_train, y_test = train_test_split(df_processed_end_results['artikler'], df_processed_end_results['type'],
-                                                    train_size=0.8,test_size=0.2, random_state=0)
+X = df_processed_end_results['artikler']
+vectorizer = CountVectorizer() #Counts and vectorizes
+X = vectorizer.fit_transform(X)
+
+
+y = df_processed_end_results['type']
+encoder = LabelEncoder() #Good for binary use, and sets fake as 0 and reliable as 1
+y = encoder.fit_transform(y)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8,test_size=0.2, random_state=0)
 X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, test_size=0.5, random_state=0)
 
-print("X:", X_train, X_test, X_val)
-print("y:", y_train, y_test, y_val)
+#Baseline models
+DecisionTree = DecisionTreeClassifier()
+LogisticRegression = LogisticRegression()
+LinearRegression = LinearRegression()
+
+DecisionTree.fit(X_train, y_train)
+LogisticRegression.fit(X_train, y_train)
+
+y_pred_decision = DecisionTree.predict(X_test)
+y_pred_logistic = LogisticRegression.predict(X_test)
+
+acc_decision = accuracy_score(y_test, y_pred_decision)
+acc_logistic = accuracy_score(y_test, y_pred_logistic)
+
+print(acc_decision)
+print(acc_logistic)
+
+# print("X:", X_train, X_test, X_val)
+# print("y:", y_train, y_test, y_val)
 #typecounter = Counter(df['type'])
 
 #print(set(df['type']))
