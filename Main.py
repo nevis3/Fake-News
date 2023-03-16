@@ -19,26 +19,27 @@ def clean_data(input_text, regex_filter):
     cleaned_text = re.sub(r'(\S+\.net*\S+)', '<url>', cleaned_text)
     #cleaned_text = re.sub(r'\|', '', cleaned_text)
     cleaned_text = clean(cleaned_text,  # does not remove special characters such as < , ^ etc.
-         normalize_whitespace=True,
-         fix_unicode=True,  # fix various unicode errors
-         to_ascii=True,  # transliterate to closest ASCII representation
-         lower=True,  # lowercase text
-         no_line_breaks=True,  # fully strip line breaks as opposed to only normalizing them
-         no_urls=True,  # replace all URLs with a special token
-         no_emails=True,  # replace all email addresses with a special token
-         no_phone_numbers=True,  # replace all phone numbers with a special token
-         no_numbers=True,  # replace all numbers with a special token
-         no_digits=True,  # replace all digits with a special token
-         no_currency_symbols=True,  # replace all currency symbols with a special token
-         no_punct=True,  # remove punctuations
-         replace_with_punct="",  # instead of removing punctuations you may replace them
-         replace_with_url="<URL>",
-         replace_with_email="<EMAIL>",
-         replace_with_phone_number="<PHONE>",
-         replace_with_number="<NUMBER>",
-         replace_with_digit="<DIGIT>",
-         replace_with_currency_symbol="<CUR>",
-         lang="en")
+        normalize_whitespace=True,
+        fix_unicode=True,  # fix various unicode errors
+        to_ascii=True,  # transliterate to closest ASCII representation
+        lower=True,  # lowercase text
+        no_line_breaks=True,  # fully strip line breaks as opposed to only normalizing them
+        no_urls=True,  # replace all URLs with a special token
+        no_emails=True,  # replace all email addresses with a special token
+        no_phone_numbers=True,  # replace all phone numbers with a special token
+        no_numbers=True,  # replace all numbers with a special token
+        no_digits=True,  # replace all digits with a special token
+        no_currency_symbols=True,  # replace all currency symbols with a special token
+        no_punct=True,  # remove punctuations
+        no_emoji=True,
+        replace_with_punct="",  # instead of removing punctuations you may replace them
+        replace_with_url="<URL>",
+        replace_with_email="<EMAIL>",
+        replace_with_phone_number="<PHONE>",
+        replace_with_number="<NUMBER>",
+        replace_with_digit="<DIGIT>",
+        replace_with_currency_symbol="<CUR>",
+        lang="en")
 
     word_filter_list = []
     #print(len(cleaned_text))
@@ -89,7 +90,7 @@ for i in range(0,len(df)-1):
     word_counter += Counter(data_new[0])
     pre_stopwords_counter += Counter(data_new[2])
     pre_stemmed_words += Counter(data_new[3])
-    end_result.append(data_new[0])
+    end_result.append([' '.join(data_new[0]), df.iloc[i]['type']])
 
 
     for j in range(0, len(data_new[1])):
@@ -98,7 +99,7 @@ for i in range(0,len(df)-1):
 
 item_list = list(word_counter.items())
 sorted_list = sorted(item_list, key=(lambda tpl: tpl[1]), reverse=True)
-print(end_result)
+#print(end_result)
 #print("cleaned", len(sorted_list))
 #print(sorted_list)
 #print("<words> lenght", len(url_counter))
@@ -106,8 +107,9 @@ print(end_result)
 #print("pre stopwords", len(pre_stopwords_counter))
 #print("pre stemmed", len(pre_stemmed_words))
 
-df_processed = pd.DataFrame (sorted_list, columns = ['words', 'amount'])
-df_processed_end_results = pd.DataFrame(end_result, columns=['artikler'])
+#df_processed = pd.DataFrame (sorted_list, columns = ['words', 'amount'])
+df_processed_end_results = pd.DataFrame(end_result, columns=['artikler', 'type'])
+#print(df_processed_end_results)
 #print(df_processed['words'])
 """sorted_final = sorted_list[0:1000]
 name_list, count_list = zip(*sorted_final)
@@ -119,6 +121,9 @@ plt.show()"""
 
 
 
-X_train, X_test, y_train, y_test = train_test_split(df_processed_end_results['artikler'], df_processed['amount'],
-                                                    train_size=0.8,test_size=0.2, stratify=df_processed['amount'], random_state=0)
-X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, test_size=0.5,stratify=y_test, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(df_processed_end_results['artikler'], df_processed_end_results['type'],
+                                                    train_size=0.8,test_size=0.2, random_state=0)
+X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, test_size=0.5, random_state=0)
+
+print("X:", X_train, X_test, X_val)
+print("y:", y_train, y_test, y_val)
