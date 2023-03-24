@@ -15,7 +15,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 
-df = pd.read_csv('news_sample.csv', encoding='utf8')
+df = pd.read_csv('news_cleaned_2018_02_13.csv', encoding='utf8', nrows=100000)
+
 
 def clean_data(input_text, regex_filter):
     cleaned_text = re.sub(r'(\S+\.com*\S+)', '<url>', input_text)
@@ -57,7 +58,7 @@ def clean_data(input_text, regex_filter):
         cleaned_text = re.sub(' +', ' ', cleaned_text)
     #print(len(cleaned_text))
 
-    pre_stop_words = word_tokenize(cleaned_text)
+    #pre_stop_words = word_tokenize(cleaned_text)
 
     stop_words = set(stopwords.words('english'))
     filtered_sentence = []
@@ -68,7 +69,7 @@ def clean_data(input_text, regex_filter):
             filtered_sentence.append(w)
     #print(len(filtered_sentence))
 
-    pre_stemmed_words = filtered_sentence
+    #pre_stemmed_words = filtered_sentence
 
     ps = PorterStemmer()
     stemmed_words = []
@@ -80,7 +81,7 @@ def clean_data(input_text, regex_filter):
         # print(root_words)
     #print(len(stemmed_words))
 
-    return stemmed_words, word_filter_list, pre_stop_words, pre_stemmed_words, stemmed_words
+    return stemmed_words #, word_filter_list, pre_stop_words, pre_stemmed_words, stemmed_words
 
 word_counter = Counter()
 url_counter = [['<url>', 0], ['<email>', 0], ['<phone>', 0], ['<number>', 0], ['<digit>', 0], ['<cur>', 0]]
@@ -88,27 +89,29 @@ pre_stopwords_counter = Counter()
 pre_stemmed_words = Counter()
 end_result = []
 
-for i in range(0,len(df)-1):
+for i in range(0, len(df)-1):
     #print(str(df.iloc[i]['type']))
     if str(df.iloc[i]['type']) == "nan" or str(df.iloc[i]['type']) == "unknown":
         #print(df.iloc[i]['type'])
         continue
     data_new = clean_data(df.iloc[i]['content'], ['<url>', '<email>', '<phone>', '<number>', '<digit>', '<cur>'])
-    word_counter += Counter(data_new[0])
-    pre_stopwords_counter += Counter(data_new[2])
-    pre_stemmed_words += Counter(data_new[3])
+
+    #word_counter += Counter(data_new[0])
+    #pre_stopwords_counter += Counter(data_new[2])
+    #pre_stemmed_words += Counter(data_new[3])
     type_name = df.iloc[i]['type']
-    if type_name in ['unreliable', 'bias', 'clickbait', 'junksci', 'political', 'conspiracy', 'hate', 'fake']:
+    if type_name in ['unreliable', 'bias', 'clickbait', 'junksci', 'political', 'conspiracy', 'hate', 'rumor', 'satire']:
         type_name = 'fake'
-    end_result.append([' '.join(data_new[0]), type_name])
+    end_result.append([' '.join(data_new), type_name])
 
 
-    for j in range(0, len(data_new[1])):
-        url_counter[j][1] += data_new[1][j][1]
+    #for j in range(0, len(data_new[1])):
+        #url_counter[j][1] += data_new[1][j][1]
 
 #print(end_result)
 item_list = list(word_counter.items())
 sorted_list = sorted(item_list, key=(lambda tpl: tpl[1]), reverse=True)
+
 #print(end_result)
 #print("cleaned", len(sorted_list))
 #print(sorted_list)
@@ -119,6 +122,7 @@ sorted_list = sorted(item_list, key=(lambda tpl: tpl[1]), reverse=True)
 
 #df_processed = pd.DataFrame (sorted_list, columns = ['words', 'amount'])
 df_processed_end_results = pd.DataFrame(end_result, columns=['artikler', 'type'])
+df_processed_end_results.to_csv('processed.csv')
 #print(df_processed_end_results)
 #print(df_processed['words'])
 
@@ -139,17 +143,16 @@ X = df_processed_end_results['artikler']
 vectorizer = CountVectorizer() #Counts and vectorizes
 X = vectorizer.fit_transform(X)
 
-
 y = df_processed_end_results['type']
 encoder = LabelEncoder() #Good for binary use, and sets fake as 0 and reliable as 1
 y = encoder.fit_transform(y)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8,test_size=0.2, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8, test_size=0.2, random_state=0)
 X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, test_size=0.5, random_state=0)
 
 #Baseline models
 DecisionTree = DecisionTreeClassifier()
-LogisticRegression = LogisticRegression()
+LogisticRegression = LogisticRegression(max_iter=1000)
 LinearRegression = LinearRegression()
 
 DecisionTree.fit(X_train, y_train)
