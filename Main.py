@@ -15,9 +15,9 @@ from sklearn.metrics import accuracy_score
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 
-df = pd.read_csv('news_cleaned_2018_02_13.csv', encoding='utf8', nrows=100000)
+df = pd.read_csv('news_cleaned_2018_02_13.csv', encoding='utf8')
 
-
+print(len(df.index))
 def clean_data(input_text, regex_filter):
     cleaned_text = re.sub(r'(\S+\.com*\S+)', '<url>', input_text)
     cleaned_text = re.sub(r'(\S+\.net*\S+)', '<url>', cleaned_text)
@@ -100,8 +100,10 @@ for i in range(0, len(df)-1):
     #pre_stopwords_counter += Counter(data_new[2])
     #pre_stemmed_words += Counter(data_new[3])
     type_name = df.iloc[i]['type']
-    if type_name in ['unreliable', 'bias', 'clickbait', 'junksci', 'political', 'conspiracy', 'hate', 'rumor', 'satire']:
+    if type_name in ['unreliable', 'bias', 'clickbait', 'junksci', 'conspiracy', 'hate', 'rumor', 'satire']:
         type_name = 'fake'
+    else:
+        type_name = 'reliable'
     end_result.append([' '.join(data_new), type_name])
 
 
@@ -152,14 +154,14 @@ X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, test_size=0.5, r
 
 #Baseline models
 DecisionTree = DecisionTreeClassifier()
-LogisticRegression = LogisticRegression(max_iter=1000)
+LogisticRegression = LogisticRegression(max_iter=100)
 LinearRegression = LinearRegression()
 
 DecisionTree.fit(X_train, y_train)
 LogisticRegression.fit(X_train, y_train)
 
 y_pred_decision = DecisionTree.predict(X_test)
-y_pred_logistic = LogisticRegression.predict(X_test)
+y_pred_logistic = LogisticRegression.predict(X_val)
 
 acc_decision = accuracy_score(y_test, y_pred_decision)
 acc_logistic = accuracy_score(y_test, y_pred_logistic)
