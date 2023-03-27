@@ -148,7 +148,6 @@ train.tsv
 valid.tsv
 
 processed.csv
-Svenne.ipynb
 cleaned_text.csv
 filtered_placeholder_words.csv
 filtered_and_stemmed_words.csv
