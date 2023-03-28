@@ -154,3 +154,7 @@ filtered_and_stemmed_words.csv
 removed_.csv
 content_type_data.csv
 cleaned_changed_types.csv
+removed_placeholder.csv
+cleaned_removed_placeholder.csv
+cleaned_removed_stop_words.csv
+cleaned_stemmed.csv
