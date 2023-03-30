@@ -9,6 +9,6 @@ To run the code in the jupyter notebook (.ipynb) file, you first of all have to 
 This also includes different libraries such as sklearn (see requirements.txt for more info). All of these can be installed using 'pip'
 
 # Conclusion
-This project demonstrates different NLP techniques, how these work and how the statistics from this can be usefull. We then train different baseline- and advanced models up against each other, and hyperoptimate optimize the one which did best (with no errors!). 
+This project demonstrates different NLP techniques, how these work and how the statistics from this can be usefull. We then train different baseline- and advanced models up against each other, and hyperparameter optimize the one which did best (with no errors!). 
 
 For more info contact the authors of this project. Thank you. 
