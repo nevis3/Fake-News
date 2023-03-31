@@ -1,3 +1,0 @@
-first we need to find url, dates etc, because tokenization splits urls and that is a problem: "'https', ':', '//www.youtube.com/watch', '?', 'v=2nKcDiIc8JY"
-problem with tokenize is that symbols such as <> are tokenized for themselves, counting url, etc is not a problem, but these words may actually be in the text from the beginning.
-Such as hius number was up, dont know how to work around, using regex helps
